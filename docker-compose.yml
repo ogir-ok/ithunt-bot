@@ -1,0 +1,67 @@
+version: "3.0"
+
+services:
+  db:
+    image: postgres
+    env_file:
+      - .env
+    environment:
+      - PGDATA=/var/lib/postgresql/pgdata/
+    volumes:
+      - pgdata:/var/lib/postgresql/pgdata/
+    ports:
+      - 5432:5432
+  web:
+    build: .
+    image: ithillel-web
+    volumes:
+      - .:/src/
+      - static:/static
+      - media:/media
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+        DJANGO_SETTINGS_MODULE: 'config.settings.dev'
+        PY_AUTORELOAD: 1
+    command: /bin/bash -c 'pip install -r requirements-dev.txt && invoke run'
+
+  ui:
+    image: node:16.14.2
+    volumes:
+      - ./client:/src
+    ports:
+      - 3000:3000
+    command: /bin/bash -c "cd /src/; npm i; npm run dev"
+
+  bot:
+    build: .
+    image: ithillel-web
+    depends_on:
+      - db
+      - web
+    env_file:
+      - .env
+    volumes_from:
+      - web
+    environment:
+      DJANGO_SETTINGS_MODULE: 'config.settings.dev'
+    command: /bin/bash -c 'pip install -r requirements-dev.txt && python bot.py'
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - static:/static:ro
+      - media:/media:ro
+    links:
+      - web
+      - ui
+    ports:
+      - 8000:80
+
+volumes:
+  pgdata: { }
+  static: { }
+  media: { }

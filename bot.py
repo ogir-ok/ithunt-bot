@@ -28,7 +28,7 @@ async def send_welcome(message: types.Message):
 
 async def store_message(message):
     async with aiohttp.ClientSession() as session:
-        await session.post(f'{WEB_URL}/api/v1/vacancy/', data=f'{message.text}')
+        await session.post(f'{WEB_URL}/api/v1/message/new/', data=f'{message.text}')
 
 
 @dp.message_handler()

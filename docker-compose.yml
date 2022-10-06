@@ -9,8 +9,6 @@ services:
       - PGDATA=/var/lib/postgresql/pgdata/
     volumes:
       - pgdata:/var/lib/postgresql/pgdata/
-    ports:
-      - 5432:5432
   web:
     build: .
     image: ithillel-web
@@ -59,7 +57,7 @@ services:
       - web
       - ui
     ports:
-      - 8000:80
+      - 8088:80
 
 volumes:
   pgdata: { }

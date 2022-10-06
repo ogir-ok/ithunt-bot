@@ -57,7 +57,7 @@ services:
       - web
       - ui
     ports:
-      - 8088:80
+      - 9333:80
 
 volumes:
   pgdata: { }
